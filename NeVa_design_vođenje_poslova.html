@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeVa design — vođenje poslova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2EFE9;
+    --surface:#FFFFFF;
+    --surface-alt:#F8F6F1;
+    --border:#DDD6C7;
+    --ink:#2A2420;
+    --ink-muted:#8A8071;
+    --primary:#2F5D62;
+    --primary-dark:#1F4347;
+    --primary-light:#E4EDEC;
+    --amber:#C1793B;
+    --amber-light:#F6E8D8;
+    --green:#4C7A5A;
+    --green-light:#E4EFE7;
+    --rust:#B5533C;
+    --rust-light:#F5E2DD;
+    --radius:10px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased;}
+  #app{max-width:900px;margin:0 auto;padding-bottom:60px;}
+
+  /* Header */
+  .header{background:var(--primary-dark);color:#fff;padding:22px 18px 16px;}
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand-mark{font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:0.02em;}
+  .brand-sub{font-size:12px;color:#B9CBCB;font-weight:500;}
+  .ruler{margin-top:14px;height:10px;position:relative;border-top:1px solid rgba(255,255,255,0.35);}
+  .ruler::before{content:"";position:absolute;top:0;left:0;right:0;height:10px;background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.35) 0, rgba(255,255,255,0.35) 1px, transparent 1px, transparent 14px);}
+
+  /* Nav */
+  .nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+  .nav button{flex:1;padding:13px 6px;background:none;border:none;font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--ink-muted);cursor:pointer;border-bottom:3px solid transparent;}
+  .nav button.active{color:var(--primary-dark);border-bottom-color:var(--amber);}
+
+  .content{padding:16px;}
+
+  /* Buttons */
+  button{font-family:var(--font-body);}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-weight:600;font-size:13.5px;cursor:pointer;}
+  .btn:hover{background:var(--surface-alt);}
+  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-ghost{border-color:transparent;background:none;color:var(--primary-dark);padding:6px 8px;}
+  .btn-danger{color:var(--rust);border-color:var(--rust-light);background:var(--rust-light);}
+  .btn-sm{padding:6px 10px;font-size:12.5px;}
+  .btn-block{width:100%;justify-content:center;}
+
+  /* Cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+  .cust-card{display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+  .cust-card:hover{border-color:var(--primary);}
+  .cust-name{font-family:var(--font-display);font-weight:700;font-size:16px;}
+  .cust-meta{font-size:12px;color:var(--ink-muted);margin-top:2px;}
+  .chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+  .chip{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .chip-on{background:var(--green-light);color:var(--green);}
+  .chip-off{background:var(--surface-alt);color:var(--ink-muted);border:1px solid var(--border);}
+  .chip-mid{background:var(--amber-light);color:var(--amber);}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--ink-muted);}
+  .empty-title{font-family:var(--font-display);font-weight:700;color:var(--ink);font-size:17px;margin-bottom:6px;}
+
+  /* Add customer bar */
+  .add-bar{display:flex;gap:8px;margin-bottom:16px;align-items:stretch;}
+  .add-bar input{flex:1;}
+  .add-bar .field-mic-row{flex:1;}
+
+  /* Form elements */
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-muted);margin-bottom:4px;margin-top:12px;}
+  label:first-child{margin-top:0;}
+  input[type=text],input[type=number],input[type=date],select{
+    width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:7px;font-size:14px;font-family:var(--font-body);background:#fff;color:var(--ink);
+  }
+  input:focus,select:focus{outline:2px solid var(--primary);outline-offset:1px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .checkline{display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;user-select:none;}
+  .checkline input{width:17px;height:17px;accent-color:var(--primary);}
+  .checkline span{font-size:13.5px;font-weight:600;}
+
+  /* Detail header */
+  .detail-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .back{color:var(--primary-dark);font-weight:600;font-size:13px;background:none;border:none;cursor:pointer;padding:4px 0 12px;}
+  .detail-name-input{font-family:var(--font-display);font-weight:700;font-size:20px;border:none;background:none;padding:0;width:100%;color:var(--ink);}
+  .detail-name-input:focus{outline:none;border-bottom:2px solid var(--amber);}
+
+  /* Segments */
+  details.segment{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+  details.segment[open]{border-color:var(--primary);}
+  summary.seg-head{list-style:none;cursor:pointer;padding:14px;display:flex;align-items:center;gap:12px;background:var(--surface-alt);}
+  summary.seg-head::-webkit-details-marker{display:none;}
+  .seg-num{font-family:var(--font-display);font-weight:700;font-size:12px;color:#fff;background:var(--primary);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .seg-title{font-family:var(--font-display);font-weight:700;font-size:15px;flex:1;}
+  .seg-status{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
+  .seg-body{padding:14px;border-top:1px solid var(--border);}
+  .sub-head{font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--primary-dark);margin:18px 0 8px;padding-top:12px;border-top:1px dashed var(--border);}
+  .sub-head:first-of-type{border-top:none;padding-top:0;margin-top:6px;}
+
+  /* multi-firm rows */
+  .firm-row{background:var(--surface-alt);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;}
+  .firm-row-top{display:flex;gap:8px;align-items:flex-start;}
+  .firm-row-top .grow{flex:1;}
+  .rm-btn{background:var(--rust-light);color:var(--rust);border:none;border-radius:6px;width:30px;height:30px;flex-shrink:0;cursor:pointer;font-size:15px;margin-top:20px;}
+  .file-btn-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+  .file-btn-row input[type=file]{font-size:12px;}
+  .file-thumb{width:34px;height:34px;object-fit:cover;border-radius:5px;border:1px solid var(--border);}
+  .file-name{font-size:11.5px;color:var(--ink-muted);word-break:break-all;}
+
+  .summary-box{background:var(--primary-light);border:1px solid var(--primary);border-radius:8px;padding:12px;margin-top:14px;}
+  .sum-line{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0;}
+  .sum-line b{font-family:var(--font-display);}
+  .sum-total{border-top:1px solid var(--primary);margin-top:6px;padding-top:8px;font-weight:700;}
+
+  /* Pregled */
+  .pregled-card .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
+
+  /* Reports */
+  .rep-item{margin-bottom:10px;}
+  .rep-label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;}
+  .rep-bar-bg{background:var(--surface-alt);border-radius:6px;height:10px;overflow:hidden;}
+  .rep-bar{background:var(--primary);height:100%;border-radius:6px;}
+  .rep-bar.amber{background:var(--amber);}
+
+  h2.section-title{font-family:var(--font-display);font-size:17px;margin:4px 0 14px;}
+  .note{font-size:12px;color:var(--ink-muted);margin-top:6px;}
+  select{appearance:auto;}
+
+  /* Voice input */
+  .field-mic-row{display:flex;gap:6px;align-items:stretch;}
+  .field-mic-row input{flex:1;min-width:0;}
+  .mic-btn{flex-shrink:0;width:38px;border-radius:7px;border:1px solid var(--border);background:var(--surface-alt);font-size:15px;cursor:pointer;}
+  .mic-btn.listening{background:var(--rust);border-color:var(--rust);color:#fff;animation:pulse 1s infinite;}
+  @keyframes pulse{0%{opacity:1;}50%{opacity:0.55;}100%{opacity:1;}}
+
+  /* Calendar reminder */
+  .date-row{display:flex;gap:6px;align-items:stretch;}
+  .date-row input{flex:1;min-width:0;}
+  .cal-btn{flex-shrink:0;width:38px;border-radius:7px;border:1px solid var(--primary);background:var(--primary-light);font-size:15px;cursor:pointer;color:var(--primary-dark);}
+
+  /* Stats */
+  .stat-card{background:var(--primary-dark);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+  .stat-label{font-size:12px;color:#B9CBCB;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;}
+  .stat-value{font-family:var(--font-display);font-weight:700;font-size:26px;margin-top:4px;}
+
+  /* Poslovi (jobs) — mid-level container between kupac and ponuda/nabavka/izrada */
+  details.segment.posao-segment{border-color:var(--amber);}
+  details.segment.posao-segment>summary.seg-head.posao-head{background:var(--amber-light);}
+  .posao-title-input{font-family:var(--font-display);font-weight:700;font-size:15px;border:none;background:none;flex:1;min-width:0;color:var(--ink);padding:0;}
+  .posao-title-input:focus{outline:none;border-bottom:2px solid var(--amber);}
+
+  /* Ponuda cards — multiple offers within one posao */
+  .ponuda-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:hidden;}
+  .ponuda-card[open]{border-color:var(--primary);}
+  .ponuda-head{list-style:none;cursor:pointer;padding:11px 12px;display:flex;align-items:center;gap:9px;background:var(--surface-alt);}
+  .ponuda-head::-webkit-details-marker{display:none;}
+  .ponuda-title-input{font-family:var(--font-display);font-weight:700;font-size:13.5px;border:none;background:none;flex:1;min-width:0;color:var(--ink);padding:0;}
+  .ponuda-title-input:focus{outline:none;border-bottom:2px solid var(--amber);}
+  .ponuda-body{padding:12px;border-top:1px solid var(--border);}
+
+  .rm-btn-inline{background:var(--rust-light);color:var(--rust);border:none;border-radius:6px;width:26px;height:26px;flex-shrink:0;cursor:pointer;font-size:13px;}
+  input:disabled{background:var(--surface-alt);color:var(--ink-muted);}
+  .seg-head-row{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;}
+
+  /* Auth / sync UI */
+  .auth-wrap{max-width:340px;margin:60px auto;padding:24px;}
+  .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+  .auth-title{font-family:var(--font-display);font-weight:700;font-size:19px;margin-bottom:14px;}
+  .auth-error{color:var(--rust);font-size:12.5px;margin-top:8px;min-height:16px;}
+  .auth-switch{margin-top:14px;font-size:13px;text-align:center;}
+  .auth-switch a{color:var(--primary-dark);font-weight:600;cursor:pointer;text-decoration:underline;}
+  .sync-status{font-size:11px;color:#B9CBCB;display:flex;align-items:center;gap:6px;margin-top:8px;}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#7AD08A;flex-shrink:0;}
+  .sync-dot.busy{background:var(--amber);}
+  .sync-dot.err{background:#E06B5A;}
+  .logout-link{color:#B9CBCB;font-size:11px;cursor:pointer;text-decoration:underline;margin-left:auto;}
+</style>
+</head>
+<body>
+<!-- === FIREBASE (besplatan): omogućava pristup podacima sa svih uređaja === -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<div id="app"></div>
+
+<script>
+const EUR_KM = 1.95583;
+let state = { customers: [], view: 'list', activeId: null, loaded: false, detailsState: {} };
+
+/* ====================== FIREBASE PODEŠAVANJE ======================
+   1) Idi na https://console.firebase.google.com i napravi besplatan projekat.
+   2) U projektu: Build → Authentication → Sign-in method → uključi "Email/Password".
+   3) U projektu: Build → Firestore Database → Create database (počni u "test mode", 
+      kasnije podesi pravila ispod).
+   4) Project settings (zupčanik) → General → "Your apps" → dodaj Web app (</> ikona) 
+      → kopiraj firebaseConfig objekat i zalijepi ga OVDJE umjesto reda ispod.
+   5) U Firestore → Rules, zalijepi:
+      rules_version = '2';
+      service cloud.firestore {
+        match /databases/{database}/documents {
+          match /users/{userId}/customers/{customerId} {
+            allow read, write: if request.auth != null && request.auth.uid == userId;
+          }
+        }
+      }
+===================================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAGQOmDYg_DJLLQMZwHFjh3nZ5dYsRTMzQ",
+  authDomain: "neva-design-123.firebaseapp.com",
+  projectId: "neva-design-123",
+  storageBucket: "neva-design-123.firebasestorage.app",
+  messagingSenderId: "1067156557306",
+  appId: "1:1067156557306:web:b1a22ef3c93c1d54032843"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
+let saveTimer = null;
+let authView = 'login'; // 'login' | 'signup'
+let authError = '';
+
+/* ---------- utils ---------- */
+function uid(){ return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function num(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function money(n){ return n.toLocaleString('sr-Latn-BA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function toKM(iznos, valuta){ return valuta==='EUR' ? num(iznos)*EUR_KM : num(iznos); }
+function sumArr(arr, field){ return (arr||[]).reduce((s,x)=>s+num(x[field]),0); }
+
+/* ---------- open/closed <details> state (kept across re-renders in this session) ---------- */
+function onSegToggle(key, el){ state.detailsState[key] = el.open; }
+function openAttr(key, def){ const v = (key in state.detailsState) ? state.detailsState[key] : def; return v ? 'open' : ''; }
+
+/* ---------- data model ---------- */
+function newPonuda(naziv){
+  return {
+    id: uid(),
+    naziv: naziv || 'Ponuda',
+    firma: '',
+    fajlPoslatFirmi: null, fajlPoslatDatum: '',
+    ponudaMaterijalIznos: '', ponudaMaterijalDatum: '', ponudaMaterijalFajl: null,
+    cijenaOkovaIznos: '', cijenaOkovaDatum: '', cijenaOkovaFajl: null,
+    nasIznos: '',
+    ponudaPoslataKupcu: false, ponudaIznos: '', ponudaDatum: '',
+    ponudaPotvrdjena: false, dogovoreniIznos: '',
+    avansi: []
+  };
+}
+function newPosao(naziv){
+  return {
+    id: uid(),
+    naziv: naziv || 'Posao',
+    okvirniDatumIzrade:'', rokDizajn:'', dizajnPredat:false, dizajnPotvrdjen:false, dizajnFajl:null,
+    ponude: [ newPonuda('Ponuda 1') ],
+    nabavka: { kroznaListe: [], okoviKupljeni: [] },
+    izrada: { status:'nije_pocelo', naplata:{ naplaceno:false, iznos:'', valuta:'KM', iznosNeso:'', iznosVaso:'', datum:'' } }
+  };
+}
+function newCustomer(naziv){
+  return {
+    id: uid(),
+    naziv: naziv || 'Novi kupac',
+    kontakt: '',
+    napomene: [],
+    poslovi: [ newPosao('Posao 1') ]
+  };
+}
+
+function getCustomer(id){ return state.customers.find(c=>c.id===id); }
+function getPosao(cid,pid){ const c=getCustomer(cid); return c && c.poslovi.find(p=>p.id===pid); }
+function getPonuda(cid,pid,oid){ const p=getPosao(cid,pid); return p && p.ponude.find(o=>o.id===oid); }
+
+/* ---------- computed ---------- */
+function trosakPonude(o){ return num(o.ponudaMaterijalIznos) + num(o.cijenaOkovaIznos); }
+function nasaPonudaKupcu(o){ return trosakPonude(o) + num(o.nasIznos); }
+function ocekivanaZarada(o){ return nasaPonudaKupcu(o) - trosakPonude(o); }
+function avansUkupnoKM(o){ return (o.avansi||[]).reduce((s,a)=>s+toKM(a.iznos,a.valuta),0); }
+function preostaloOdKupca(o){ return num(o.dogovoreniIznos) - avansUkupnoKM(o); }
+function ukupanPrihod(){
+  let s = 0;
+  state.customers.forEach(c=> (c.poslovi||[]).forEach(p=>{
+    if(p.izrada.naplata.naplaceno) s += toKM(p.izrada.naplata.iznos, p.izrada.naplata.valuta);
+  }));
+  return s;
+}
+function ukupnoPoOsobi(){
+  let neso = 0, vaso = 0;
+  state.customers.forEach(c=> (c.poslovi||[]).forEach(p=>{
+    if(p.izrada.naplata.naplaceno){
+      neso += toKM(p.izrada.naplata.iznosNeso, p.izrada.naplata.valuta);
+      vaso += toKM(p.izrada.naplata.iznosVaso, p.izrada.naplata.valuta);
+    }
+  }));
+  return {neso, vaso};
+}
+function posaoStatus(p){
+  if(p.izrada.naplata.naplaceno) return {text:'Naplaćeno', cls:'chip-on'};
+  if(p.izrada.status==='zavrseno') return {text:'Izrada završena', cls:'chip-mid'};
+  if(p.izrada.status==='u_izradi') return {text:'U izradi / montaži', cls:'chip-mid'};
+  if(p.ponude.some(o=>o.ponudaPotvrdjena)) return {text:'Ponuda potvrđena', cls:'chip-mid'};
+  if(p.ponude.some(o=>o.ponudaPoslataKupcu)) return {text:'Ponuda poslata', cls:'chip-mid'};
+  return {text:'U pripremi', cls:'chip-off'};
+}
+
+/* ---------- persistence / migration ---------- */
+function migrateCustomer(c){
+  if(!Array.isArray(c.napomene)) c.napomene = [];
+  if(!Array.isArray(c.poslovi)){
+    const oldP = c.ponuda || {};
+    const oldN = c.nabavka || {kroznaListe:[],okoviKupljeni:[]};
+    const oldI = c.izrada || {status:'nije_pocelo', naplata:{naplaceno:false,iznos:'',valuta:'KM',datum:''}};
+    const ponuda1 = newPonuda('Ponuda 1');
+    ponuda1.ponudaMaterijalIznos = sumArr(oldP.kroznaListaFirme,'iznos') || '';
+    ponuda1.cijenaOkovaIznos = sumArr(oldP.okovFirme,'iznos') || '';
+    ponuda1.ponudaPoslataKupcu = !!oldP.ponudaPoslataKupcu;
+    ponuda1.ponudaIznos = oldP.ponudaIznos || '';
+    ponuda1.ponudaDatum = oldP.ponudaDatum || '';
+    ponuda1.ponudaPotvrdjena = !!oldP.ponudaPotvrdjena;
+    ponuda1.dogovoreniIznos = oldP.dogovoreniIznos || '';
+    ponuda1.avansi = oldP.avansi || [];
+    const posao1 = newPosao('Posao 1');
+    posao1.okvirniDatumIzrade = oldP.okvirniDatumIzrade || '';
+    posao1.rokDizajn = oldP.rokDizajn || '';
+    posao1.dizajnPredat = !!oldP.dizajnPredat;
+    posao1.dizajnPotvrdjen = !!oldP.dizajnPotvrdjen;
+    posao1.dizajnFajl = oldP.dizajnFajl || null;
+    posao1.ponude = [ponuda1];
+    posao1.nabavka = oldN;
+    posao1.izrada = oldI;
+    c.poslovi = [posao1];
+    delete c.ponuda; delete c.nabavka; delete c.izrada;
+  }
+  c.poslovi.forEach(p=>{
+    if(!Array.isArray(p.ponude) || p.ponude.length===0) p.ponude = [newPonuda('Ponuda 1')];
+    if(!p.nabavka) p.nabavka = {kroznaListe:[],okoviKupljeni:[]};
+    if(!p.izrada) p.izrada = {status:'nije_pocelo', naplata:{naplaceno:false,iznos:'',valuta:'KM',iznosNeso:'',iznosVaso:'',datum:''}};
+    if(typeof p.izrada.naplata.iznosNeso === 'undefined') p.izrada.naplata.iznosNeso = '';
+    if(typeof p.izrada.naplata.iznosVaso === 'undefined') p.izrada.naplata.iznosVaso = '';
+    p.ponude.forEach(o=>{
+      if(!Array.isArray(o.avansi)) o.avansi = [];
+      if(typeof o.firma === 'undefined') o.firma = '';
+      if(typeof o.nasIznos === 'undefined') o.nasIznos = '';
+      delete o.nasProcenat;
+    });
+  });
+}
+/* ---------- Firebase Auth ---------- */
+function renderAuthScreen(){
+  const app = document.getElementById('app');
+  const isSignup = authView === 'signup';
+  app.innerHTML = `
+    <div class="header">
+      <div class="brand"><span class="brand-mark">NeVa design</span><span class="brand-sub">pločasti namještaj</span></div>
+      <div class="ruler"></div>
+    </div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-title">${isSignup ? 'Napravi nalog' : 'Prijava'}</div>
+        <label>Email</label>
+        <input type="text" id="auth-email" placeholder="tvoj@email.com">
+        <label>Lozinka</label>
+        <input type="text" id="auth-pass" placeholder="najmanje 6 karaktera">
+        <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="${isSignup?'doSignup()':'doLogin()'}">${isSignup ? 'Napravi nalog' : 'Prijavi se'}</button>
+        <div class="auth-error">${esc(authError)}</div>
+        <div class="auth-switch">
+          ${isSignup
+            ? `Već imaš nalog? <a onclick="authView='login';authError='';renderAuthScreen()">Prijavi se</a>`
+            : `Nemaš nalog? <a onclick="authView='signup';authError='';renderAuthScreen()">Napravi ga</a>`}
+        </div>
+      </div>
+    </div>`;
+}
+function doLogin(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  authError = '';
+  auth.signInWithEmailAndPassword(email, pass).catch(e=>{ authError = prevediGresku(e); renderAuthScreen(); });
+}
+function doSignup(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  authError = '';
+  auth.createUserWithEmailAndPassword(email, pass).catch(e=>{ authError = prevediGresku(e); renderAuthScreen(); });
+}
+function doLogout(){
+  if(!confirm('Odjaviti se sa ovog uređaja?')) return;
+  auth.signOut();
+}
+function prevediGresku(e){
+  const map = {
+    'auth/invalid-email':'Email adresa nije ispravna.',
+    'auth/user-not-found':'Ne postoji nalog sa ovim emailom.',
+    'auth/wrong-password':'Pogrešna lozinka.',
+    'auth/invalid-credential':'Pogrešan email ili lozinka.',
+    'auth/email-already-in-use':'Nalog sa ovim emailom već postoji — prijavi se.',
+    'auth/weak-password':'Lozinka mora imati bar 6 karaktera.'
+  };
+  return map[e.code] || ('Greška: ' + e.message);
+}
+
+auth.onAuthStateChanged(function(user){
+  currentUser = user;
+  if(user){ loadData(); }
+  else{ state.loaded=false; state.customers=[]; renderAuthScreen(); }
+});
+
+/* ---------- Firestore load/save (zamjenjuje localStorage) ----------
+   Svaki kupac je poseban dokument (users/{uid}/customers/{kupacId}), 
+   umjesto da svi kupci dijele jedan zajednički dokument. Ovo daje 
+   svakom kupcu svoj vlastiti prostor (limit je po dokumentu, ne ukupno). */
+function customersColRef(){ return db.collection('users').doc(currentUser.uid).collection('customers'); }
+let knownCustomerIds = new Set();
+
+async function loadData(){
+  try{
+    const snap = await customersColRef().get();
+    state.customers = snap.docs.map(d=>d.data());
+    knownCustomerIds = new Set(snap.docs.map(d=>d.id));
+  }catch(e){
+    console.error('Greška pri učitavanju podataka', e);
+    state.customers = [];
+  }
+  state.customers.forEach(migrateCustomer);
+  state.loaded = true;
+  render();
+}
+function setSyncStatus(mode){
+  const el = document.getElementById('sync-dot');
+  if(!el) return;
+  el.className = 'sync-dot' + (mode==='busy' ? ' busy' : mode==='err' ? ' err' : '');
+}
+function downloadBackupJSON(){
+  const payload = { exportDatum: new Date().toISOString(), korisnik: currentUser?currentUser.email:'', customers: state.customers };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const datum = new Date().toISOString().slice(0,10);
+  a.download = 'neva-design-rezervna-kopija-' + datum + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+async function persist(){
+  // debounced upis u Firestore da se ne šalje zahtjev na svaki tast
+  clearTimeout(saveTimer);
+  setSyncStatus('busy');
+  saveTimer = setTimeout(async ()=>{
+    try{
+      const batch = db.batch();
+      const currentIds = new Set();
+      state.customers.forEach(c=>{
+        currentIds.add(c.id);
+        batch.set(customersColRef().doc(c.id), c);
+      });
+      knownCustomerIds.forEach(id=>{ if(!currentIds.has(id)) batch.delete(customersColRef().doc(id)); });
+      await batch.commit();
+      knownCustomerIds = currentIds;
+      setSyncStatus('ok');
+    }catch(e){
+      console.error('Greška pri čuvanju podataka', e);
+      setSyncStatus('err');
+      if(String(e.message||'').toLowerCase().includes('longer than')){
+        alert('Ovaj kupac ima previše priloženih fajlova/slika da bi stao u besplatnu bazu (limit je oko 1MB po kupcu). Ukloni neki stariji fajl kod ovog kupca, ili smanji rezoluciju slika prije dodavanja.');
+      }else{
+        alert('Greška pri čuvanju podataka na internetu — provjeri internet konekciju. Izmjene ostaju samo lokalno dok se konekcija ne uspostavi.');
+      }
+    }
+  }, 500);
+}
+
+/* ---------- mutations: customer ---------- */
+function addCustomer(naziv){
+  const c = newCustomer(naziv);
+  state.customers.push(c);
+  state.activeId = c.id; state.view = 'detail';
+  persist(); render();
+}
+function deleteCustomer(id){
+  if(!confirm('Obrisati ovog kupca i sve podatke o poslu? Ova radnja se ne može poništiti.')) return;
+  state.customers = state.customers.filter(c=>c.id!==id);
+  state.view='list'; state.activeId=null;
+  persist(); render();
+}
+function setField(id, path, value){
+  const c = getCustomer(id); if(!c) return;
+  const parts = path.split('.');
+  let obj = c;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  obj[parts[parts.length-1]] = value;
+  persist(); render();
+}
+function addRow(id, path, template){
+  const c = getCustomer(id); const parts = path.split('.');
+  let arr = c; for(const p of parts) arr = arr[p];
+  arr.push(Object.assign({id:uid()}, template));
+  persist(); render();
+}
+function removeRow(id, path, rowId){
+  const c = getCustomer(id); const parts = path.split('.');
+  let obj = c;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  const arrKey = parts[parts.length-1];
+  obj[arrKey] = obj[arrKey].filter(r=>r.id!==rowId);
+  persist(); render();
+}
+function setRowField(id, path, rowId, field, value){
+  const c = getCustomer(id); const parts = path.split('.');
+  let arr = c; for(const p of parts) arr = arr[p];
+  const row = arr.find(r=>r.id===rowId);
+  if(row) row[field] = value;
+  persist(); render();
+}
+
+/* ---------- mutations: posao ---------- */
+function addPosao(cid){
+  const c = getCustomer(cid); if(!c) return;
+  c.poslovi.push(newPosao('Posao ' + (c.poslovi.length+1)));
+  persist(); render();
+}
+function removePosao(cid, pid){
+  if(!confirm('Obrisati ovaj posao i sve podatke vezane za njega (ponude, nabavku, izradu)? Ova radnja se ne može poništiti.')) return;
+  const c = getCustomer(cid);
+  c.poslovi = c.poslovi.filter(p=>p.id!==pid);
+  if(c.poslovi.length===0) c.poslovi.push(newPosao('Posao 1'));
+  persist(); render();
+}
+function setPosaoField(cid, pid, path, value){
+  const p = getPosao(cid,pid); if(!p) return;
+  const parts = path.split('.'); let obj = p;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  obj[parts[parts.length-1]] = value;
+  persist(); render();
+}
+function addPosaoRow(cid, pid, path, template){
+  const p = getPosao(cid,pid); const parts = path.split('.');
+  let arr = p; for(const k of parts) arr = arr[k];
+  arr.push(Object.assign({id:uid()}, template));
+  persist(); render();
+}
+function removePosaoRow(cid, pid, path, rowId){
+  const p = getPosao(cid,pid); const parts = path.split('.');
+  let obj = p;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  const key = parts[parts.length-1];
+  obj[key] = obj[key].filter(r=>r.id!==rowId);
+  persist(); render();
+}
+function setPosaoRowField(cid, pid, path, rowId, field, value){
+  const p = getPosao(cid,pid); const parts = path.split('.');
+  let arr = p; for(const k of parts) arr = arr[k];
+  const row = arr.find(r=>r.id===rowId);
+  if(row) row[field] = value;
+  persist(); render();
+}
+
+/* ---------- mutations: ponuda ---------- */
+function addPonuda(cid, pid){
+  const p = getPosao(cid,pid); if(!p) return;
+  p.ponude.push(newPonuda('Ponuda ' + (p.ponude.length+1)));
+  persist(); render();
+}
+function removePonuda(cid, pid, oid){
+  const p = getPosao(cid,pid); if(!p) return;
+  if(p.ponude.length<=1){ alert('Posao mora imati barem jednu ponudu.'); return; }
+  if(!confirm('Obrisati ovu ponudu?')) return;
+  p.ponude = p.ponude.filter(o=>o.id!==oid);
+  persist(); render();
+}
+function setPonudaField(cid, pid, oid, path, value){
+  const o = getPonuda(cid,pid,oid); if(!o) return;
+  const parts = path.split('.'); let obj = o;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  obj[parts[parts.length-1]] = value;
+  persist(); render();
+}
+function addPonudaRow(cid, pid, oid, path, template){
+  const o = getPonuda(cid,pid,oid); const parts = path.split('.');
+  let arr = o; for(const k of parts) arr = arr[k];
+  arr.push(Object.assign({id:uid()}, template));
+  persist(); render();
+}
+function removePonudaRow(cid, pid, oid, path, rowId){
+  const o = getPonuda(cid,pid,oid); const parts = path.split('.');
+  let obj = o;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  const key = parts[parts.length-1];
+  obj[key] = obj[key].filter(r=>r.id!==rowId);
+  persist(); render();
+}
+function setPonudaRowField(cid, pid, oid, path, rowId, field, value){
+  const o = getPonuda(cid,pid,oid); const parts = path.split('.');
+  let arr = o; for(const k of parts) arr = arr[k];
+  const row = arr.find(r=>r.id===rowId);
+  if(row) row[field] = value;
+  persist(); render();
+}
+
+/* ---------- files ---------- */
+function readFileAsDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+// Za slike: smanjuje rezoluciju i kompresuje, da bi stale u besplatnu bazu (limit ~1MB po kupcu).
+// Za ostale fajlove (npr. PDF): vraća original, uz provjeru veličine.
+async function fileToStoredDataUrl(file){
+  if(!file.type || !file.type.startsWith('image/')){
+    if(file.size > 700*1024){
+      throw new Error('Fajl "'+file.name+'" je prevelik ('+Math.round(file.size/1024)+' KB). Za PDF/dokument fajlove, najveća dozvoljena veličina je oko 700 KB — smanji fajl (npr. skeniraj u nižoj rezoluciji ili sačuvaj kao "smaller file size" PDF) pa probaj ponovo.');
+    }
+    return await readFileAsDataUrl(file);
+  }
+  const rawUrl = await readFileAsDataUrl(file);
+  const img = await new Promise((resolve,reject)=>{
+    const im = new Image();
+    im.onload = ()=>resolve(im);
+    im.onerror = reject;
+    im.src = rawUrl;
+  });
+  const MAX_DIM = 1600;
+  let w = img.width, h = img.height;
+  if(w > MAX_DIM || h > MAX_DIM){
+    const scale = MAX_DIM / Math.max(w,h);
+    w = Math.round(w*scale); h = Math.round(h*scale);
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  let quality = 0.82;
+  let out = canvas.toDataURL('image/jpeg', quality);
+  while(out.length > 700*1024 && quality > 0.35){
+    quality -= 0.12;
+    out = canvas.toDataURL('image/jpeg', quality);
+  }
+  if(out.length > 700*1024){
+    throw new Error('Slika "'+file.name+'" je i nakon smanjenja prevelika. Probaj sa fotografijom manje rezolucije.');
+  }
+  return out;
+}
+async function handleNapomenaFileUpload(input, id, rowId){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setRowField(id, 'napomene', rowId, 'fajl', {name:file.name, dataUrl});
+}
+async function handleDesignUploadPosao(input, cid, pid){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setPosaoField(cid, pid, 'dizajnFajl', {name:file.name, dataUrl});
+}
+async function handleCuttingFileUploadPosao(input, cid, pid, rowId){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setPosaoRowField(cid, pid, 'nabavka.kroznaListe', rowId, 'fajl', {name:file.name, dataUrl});
+}
+async function handleFajlPoslatUpload(input, cid, pid, oid){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setPonudaField(cid, pid, oid, 'fajlPoslatFirmi', {name:file.name, dataUrl});
+}
+async function handlePonudaMaterijalUpload(input, cid, pid, oid){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setPonudaField(cid, pid, oid, 'ponudaMaterijalFajl', {name:file.name, dataUrl});
+}
+async function handleCijenaOkovaUpload(input, cid, pid, oid){
+  const file = input.files[0]; if(!file) return;
+  let dataUrl; try{ dataUrl = await fileToStoredDataUrl(file); }catch(e){ alert(e.message); input.value=''; return; }
+  setPonudaField(cid, pid, oid, 'cijenaOkovaFajl', {name:file.name, dataUrl});
+}
+
+/* ---------- voice input ---------- */
+function enhanceVoiceInputs(){
+  const inputs = document.querySelectorAll('#app input[type="text"]:not([data-mic]):not([disabled]), #app input[type="number"]:not([data-mic]):not([disabled])');
+  inputs.forEach(inp=>{
+    inp.setAttribute('data-mic','1');
+    const wrapper = document.createElement('div');
+    wrapper.className = 'field-mic-row';
+    inp.parentNode.insertBefore(wrapper, inp);
+    wrapper.appendChild(inp);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mic-btn';
+    btn.title = 'Unos glasom';
+    btn.textContent = '🎤';
+    btn.onclick = ()=>startVoiceInput(inp, btn);
+    wrapper.appendChild(btn);
+  });
+}
+function startVoiceInput(inputEl, btnEl){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ alert('Glasovni unos nije podržan u ovom pregledaču. Probajte u Google Chrome na Android telefonu.'); return; }
+  const recognition = new SR();
+  recognition.lang = 'hr-HR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  btnEl.classList.add('listening');
+  recognition.onresult = (e)=>{
+    const text = e.results[0][0].transcript;
+    if(inputEl.type==='number'){
+      const cleaned = text.replace(',', '.').match(/-?[\d.]+/);
+      inputEl.value = cleaned ? cleaned[0] : inputEl.value;
+    }else{
+      inputEl.value = inputEl.value ? (inputEl.value + ' ' + text) : text;
+    }
+    inputEl.dispatchEvent(new Event('change', {bubbles:true}));
+  };
+  recognition.onerror = ()=>{ btnEl.classList.remove('listening'); };
+  recognition.onend = ()=>{ btnEl.classList.remove('listening'); };
+  try{ recognition.start(); }catch(e){ btnEl.classList.remove('listening'); }
+}
+
+/* ---------- calendar reminders (.ics download) ---------- */
+function icsNow(){ return new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z'; }
+function icsEscape(s){ return String(s||'').replace(/([,;])/g,'\\$1').replace(/\n/g,'\\n'); }
+function downloadICS(title, dateStr, description){
+  if(!dateStr){ alert('Prvo unesite datum za ovo polje.'); return; }
+  const dt = dateStr.replace(/-/g,'');
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//NeVa design//Radionica//BS','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:'+uid()+'@neva-design',
+    'DTSTAMP:'+icsNow(),
+    'DTSTART;VALUE=DATE:'+dt,
+    'DTEND;VALUE=DATE:'+dt,
+    'SUMMARY:'+icsEscape(title),
+    'DESCRIPTION:'+icsEscape(description||'NeVa design — podsjetnik'),
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Podsjetnik','TRIGGER:-P1D','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (title.replace(/[^a-zA-Z0-9čćžšđČĆŽŠĐ]+/g,'_') || 'podsjetnik') + '.ics';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+}
+
+/* ---------- render root ---------- */
+function render(){
+  const app = document.getElementById('app');
+  if(!state.loaded){ app.innerHTML = '<div class="empty">Učitavanje…</div>'; return; }
+  let body = '';
+  if(state.view==='detail' && getCustomer(state.activeId)) body = renderDetail(getCustomer(state.activeId));
+  else if(state.view==='pregled') body = renderPregled();
+  else if(state.view==='izvestaji') body = renderIzvestaji();
+  else body = renderList();
+
+  app.innerHTML = `
+    <div class="header">
+      <div class="brand"><span class="brand-mark">NeVa design</span><span class="brand-sub">pločasti namještaj</span></div>
+      <div class="sync-status"><span class="sync-dot" id="sync-dot"></span><span>${esc(currentUser?currentUser.email:'')}</span><span class="logout-link" onclick="downloadBackupJSON()" style="margin-left:14px;">⬇ Preuzmi rezervnu kopiju</span><span class="logout-link" onclick="doLogout()">Odjava</span></div>
+      <div class="ruler"></div>
+    </div>
+    <div class="nav">
+      <button class="${state.view==='list'?'active':''}" onclick="switchView('list')">Kupci</button>
+      <button class="${state.view==='pregled'?'active':''}" onclick="switchView('pregled')">Pregled</button>
+      <button class="${state.view==='izvestaji'?'active':''}" onclick="switchView('izvestaji')">Izvještaji</button>
+    </div>
+    <div class="content">${body}</div>
+  `;
+  enhanceVoiceInputs();
+}
+function switchView(v){ state.view=v; state.activeId=null; render(); }
+function openCustomer(id){ state.activeId=id; state.view='detail'; render(); window.scrollTo(0,0); }
+
+/* ---------- list view ---------- */
+function renderList(){
+  let html = `
+    <div class="add-bar">
+      <input type="text" id="newCustName" placeholder="Ime i prezime kupca…" onkeydown="if(event.key==='Enter') submitNewCustomer()">
+      <button class="btn btn-primary" onclick="submitNewCustomer()">+ Dodaj kupca</button>
+    </div>`;
+  if(state.customers.length===0){
+    html += `<div class="empty"><div class="empty-title">Još nema kupaca</div>Dodajte prvog kupca da započnete vođenje posla.</div>`;
+    return html;
+  }
+  html += state.customers.slice().reverse().map(c=>{
+    const faza = fazaLabel(c);
+    return `<div class="card cust-card" onclick="openCustomer('${c.id}')">
+      <div>
+        <div class="cust-name">${esc(c.naziv)}</div>
+        <div class="cust-meta">${faza.text}</div>
+        <div class="chip-row">
+          ${chip(c.poslovi.some(p=>p.dizajnPotvrdjen),'Dizajn potvrđen')}
+          ${chip(c.poslovi.some(p=>p.ponude.some(o=>o.ponudaPotvrdjena)),'Ponuda potvrđena')}
+          ${chip(c.poslovi.some(p=>p.ponude.some(o=>o.avansi.length>0)),'Avans dat')}
+          ${chip(c.poslovi.some(p=>p.izrada.naplata.naplaceno),'Naplaćeno')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return html;
+}
+function chip(on,label){ return `<span class="chip ${on?'chip-on':'chip-off'}">${on?'✓':'○'} ${label}</span>`; }
+function submitNewCustomer(){
+  const inp = document.getElementById('newCustName');
+  const val = inp.value.trim();
+  addCustomer(val || 'Novi kupac');
+}
+function fazaLabel(c){
+  if(!c.poslovi || c.poslovi.length===0) return {text:'Nema poslova'};
+  let best = {text:'U fazi ponude', rank:0};
+  c.poslovi.forEach(p=>{
+    let rank=0, text='U fazi ponude';
+    if(p.izrada.naplata.naplaceno){ rank=6; text='Posao naplaćen i završen'; }
+    else if(p.izrada.status==='zavrseno'){ rank=5; text='Izrada završena — čeka se naplata'; }
+    else if(p.izrada.status==='u_izradi'){ rank=4; text='U izradi / montaži'; }
+    else if(p.ponude.some(o=>o.ponudaPotvrdjena)){ rank=3; text='Ponuda potvrđena — priprema materijala'; }
+    else if(p.ponude.some(o=>o.ponudaPoslataKupcu)){ rank=2; text='Ponuda poslata kupcu — čeka se potvrda'; }
+    else if(p.dizajnPotvrdjen){ rank=1; text='Dizajn potvrđen — priprema ponude'; }
+    if(rank>best.rank) best = {text, rank};
+  });
+  const broj = c.poslovi.length;
+  return {text: best.text + (broj>1 ? ` · ${broj} poslova` : '')};
+}
+
+/* ---------- detail view (kupac) ---------- */
+function renderDetail(c){
+  return `
+    <button class="back" onclick="switchView('list')">← Nazad na kupce</button>
+    <div class="detail-top">
+      <input class="detail-name-input" value="${esc(c.naziv)}" onchange="setField('${c.id}','naziv', this.value)">
+    </div>
+    <input type="text" placeholder="Kontakt (telefon / email)" value="${esc(c.kontakt)}" onchange="setField('${c.id}','kontakt', this.value)" style="margin-bottom:14px;">
+
+    ${renderNapomeneSegment(c)}
+    ${renderPoslovi(c)}
+
+    <button class="btn btn-danger btn-block" onclick="deleteCustomer('${c.id}')" style="margin-top:16px;">Obriši kupca</button>
+  `;
+}
+
+/* --- Napomene / bilješke (na nivou kupca) --- */
+function renderNapomeneSegment(c){
+  const list = c.napomene || [];
+  return `
+  <div class="card">
+    <div class="sub-head" style="margin-top:0;">Napomene / bilješke</div>
+    ${list.length===0 ? `<div class="note" style="margin-bottom:8px;">Još nema napomena.</div>` : ''}
+    ${list.map(nap=>{
+      const f = nap.fajl;
+      const isImg = f && /\.(jpe?g|png)$/i.test(f.name);
+      return `
+      <div class="firm-row">
+        <div class="firm-row-top">
+          <div class="grow"><label>Napomena</label><input type="text" value="${esc(nap.tekst)}" placeholder="Unesite napomenu…" onchange="setRowField('${c.id}','napomene','${nap.id}','tekst', this.value)"></div>
+          <button class="rm-btn" onclick="removeRow('${c.id}','napomene','${nap.id}')" title="Ukloni">✕</button>
+        </div>
+        <div style="margin-top:8px;">
+          <label>Datum podsjetnika (opcionalno)</label>
+          <div class="date-row">
+            <input type="date" value="${nap.datum||''}" onchange="setRowField('${c.id}','napomene','${nap.id}','datum', this.value)">
+            <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Napomena — ${esc(c.naziv)}','${nap.datum||''}','${esc(nap.tekst||('NeVa design — podsjetnik uz napomenu kupca ' + c.naziv))}')">📅</button>
+          </div>
+        </div>
+        <label style="margin-top:8px;">Prilog (fajl)</label>
+        <input type="file" onchange="handleNapomenaFileUpload(this,'${c.id}','${nap.id}')">
+        ${f ? `<div class="file-btn-row">${isImg?`<img class="file-thumb" src="${f.dataUrl}">`:''}<span class="file-name">${esc(f.name)}</span><button class="btn btn-sm btn-danger" onclick="setRowField('${c.id}','napomene','${nap.id}','fajl', null)">Ukloni</button></div>` : ''}
+      </div>`;
+    }).join('')}
+    <button class="btn btn-sm" onclick="addRow('${c.id}','napomene',{tekst:'',datum:'',fajl:null})">+ Dodaj napomenu</button>
+  </div>`;
+}
+
+/* --- Poslovi (novi segment: objedinjuje Ponudu, Nabavku i Izradu za istog kupca) --- */
+function renderPoslovi(c){
+  return `
+    <div class="seg-head-row">
+      <h2 class="section-title" style="margin:0;">Poslovi</h2>
+      <button class="btn btn-sm btn-primary" onclick="addPosao('${c.id}')">+ Naziv posla</button>
+    </div>
+    ${c.poslovi.map(p=>renderPosao(c,p)).join('')}
+  `;
+}
+
+function renderPosao(c, p){
+  const st = posaoStatus(p);
+  const key = 'posao-'+p.id;
+  return `
+  <details class="segment posao-segment" ${openAttr(key,true)} ontoggle="onSegToggle('${key}', this)">
+    <summary class="seg-head posao-head">
+      <input class="posao-title-input" value="${esc(p.naziv)}" placeholder="Naziv posla" onclick="event.stopPropagation()" onchange="setPosaoField('${c.id}','${p.id}','naziv', this.value)">
+      <span class="seg-status ${st.cls}">${st.text}</span>
+      <button class="rm-btn-inline" onclick="event.stopPropagation(); removePosao('${c.id}','${p.id}')" title="Obriši posao">✕</button>
+    </summary>
+    <div class="seg-body">
+      ${renderDizajnBlock(c,p)}
+      ${renderPonudeBlock(c,p)}
+      ${renderNabavkaSegment(c,p)}
+      ${renderIzradaSegment(c,p)}
+    </div>
+  </details>`;
+}
+
+/* --- Dizajn (zajednički za posao, primjenjuje se na sve ponude tog posla) --- */
+function renderDizajnBlock(c, p){
+  let dizajnFajlHtml = '';
+  if(p.dizajnFajl){
+    const f = p.dizajnFajl;
+    const isImg = /\.(jpe?g|png)$/i.test(f.name);
+    dizajnFajlHtml = `<div class="file-btn-row">
+      ${isImg ? `<img class="file-thumb" src="${f.dataUrl}">` : ''}
+      <span class="file-name">${esc(f.name)}</span>
+      <button class="btn btn-sm btn-danger" onclick="setPosaoField('${c.id}','${p.id}','dizajnFajl', null)">Ukloni</button>
+    </div>`;
+  }
+  return `
+    <div class="sub-head" style="margin-top:0;">Dizajn</div>
+    <div class="row2">
+      <div><label>Okvirni datum izrade</label>
+        <div class="date-row">
+          <input type="date" value="${p.okvirniDatumIzrade}" onchange="setPosaoField('${c.id}','${p.id}','okvirniDatumIzrade', this.value)">
+          <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Okvirni datum izrade — ${esc(c.naziv)} / ${esc(p.naziv)}','${p.okvirniDatumIzrade}','NeVa design — okvirni datum izrade namještaja')">📅</button>
+        </div>
+      </div>
+      <div><label>Rok za izradu dizajna</label>
+        <div class="date-row">
+          <input type="date" value="${p.rokDizajn}" onchange="setPosaoField('${c.id}','${p.id}','rokDizajn', this.value)">
+          <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Rok za izradu dizajna — ${esc(c.naziv)} / ${esc(p.naziv)}','${p.rokDizajn}','NeVa design — rok za izradu dizajna')">📅</button>
+        </div>
+      </div>
+    </div>
+    <label class="checkline"><input type="checkbox" ${p.dizajnPredat?'checked':''} onchange="setPosaoField('${c.id}','${p.id}','dizajnPredat', this.checked)"><span>Dizajn predat</span></label>
+    <label class="checkline"><input type="checkbox" ${p.dizajnPotvrdjen?'checked':''} onchange="setPosaoField('${c.id}','${p.id}','dizajnPotvrdjen', this.checked)"><span>Dizajn potvrđen</span></label>
+    <label>Dogovoreni dizajn (JPEG / PNG)</label>
+    <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onchange="handleDesignUploadPosao(this,'${c.id}','${p.id}')">
+    ${dizajnFajlHtml}
+  `;
+}
+
+/* --- Ponude (moguće više ponuda po poslu: Ponuda 1, Ponuda 2 …) --- */
+function renderPonudeBlock(c, p){
+  return `
+    <div class="sub-head" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <span>Ponude</span>
+      <button class="btn btn-sm" onclick="addPonuda('${c.id}','${p.id}')">+ Ponuda</button>
+    </div>
+    ${p.ponude.map(o=>renderPonudaCard(c,p,o)).join('')}
+  `;
+}
+
+function renderPonudaCard(c, p, o){
+  const trosak = trosakPonude(o);
+  const nasa = nasaPonudaKupcu(o);
+  const zarada = ocekivanaZarada(o);
+  const statusText = o.ponudaPotvrdjena ? 'Potvrđena' : (o.ponudaPoslataKupcu ? 'Poslata' : 'U pripremi');
+  const statusClass = o.ponudaPotvrdjena ? 'chip-on' : (o.ponudaPoslataKupcu ? 'chip-mid' : 'chip-off');
+  const key = 'ponuda-'+o.id;
+
+  function fileBlock(fieldName, f){
+    if(!f) return '';
+    const isImg = /\.(jpe?g|png)$/i.test(f.name);
+    return `<div class="file-btn-row">${isImg?`<img class="file-thumb" src="${f.dataUrl}">`:''}<span class="file-name">${esc(f.name)}</span><button class="btn btn-sm btn-danger" onclick="setPonudaField('${c.id}','${p.id}','${o.id}','${fieldName}', null)">Ukloni</button></div>`;
+  }
+
+  return `
+  <details class="ponuda-card" ${openAttr(key, p.ponude.length<=1)} ontoggle="onSegToggle('${key}', this)">
+    <summary class="ponuda-head">
+      <input class="ponuda-title-input" value="${esc(o.naziv)}" placeholder="Naziv ponude" onclick="event.stopPropagation()" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','naziv', this.value)">
+      <span class="seg-status ${statusClass}">${statusText}</span>
+      ${p.ponude.length>1 ? `<button class="rm-btn-inline" onclick="event.stopPropagation(); removePonuda('${c.id}','${p.id}','${o.id}')" title="Obriši ponudu">✕</button>` : ''}
+    </summary>
+    <div class="ponuda-body">
+      <div class="sub-head" style="margin-top:0;">Fajl poslan u firmu</div>
+      <label>Naziv firme</label>
+      <input type="text" value="${esc(o.firma)}" placeholder="Naziv firme" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','firma', this.value)">
+      <label>Datum kada je fajl poslan</label>
+      <div class="date-row">
+        <input type="date" value="${o.fajlPoslatDatum}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','fajlPoslatDatum', this.value)">
+        <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Fajl poslat firmi — ${esc(c.naziv)} / ${esc(p.naziv)}','${o.fajlPoslatDatum}','NeVa design — fajl poslat firmi')">📅</button>
+      </div>
+      <label>Upload fajla</label>
+      <input type="file" onchange="handleFajlPoslatUpload(this,'${c.id}','${p.id}','${o.id}')">
+      ${fileBlock('fajlPoslatFirmi', o.fajlPoslatFirmi)}
+
+      <div class="sub-head">Ponuda dobijena od firme za rezanje materijala</div>
+      <div class="row2">
+        <div><label>Cijena ponude (KM)</label><input type="number" step="0.01" value="${o.ponudaMaterijalIznos}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaMaterijalIznos', this.value)"></div>
+        <div><label>Datum dobijanja ponude</label>
+          <div class="date-row">
+            <input type="date" value="${o.ponudaMaterijalDatum}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaMaterijalDatum', this.value)">
+            <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Ponuda za rezanje materijala — ${esc(c.naziv)} / ${esc(p.naziv)}','${o.ponudaMaterijalDatum}','NeVa design — ponuda za rezanje materijala')">📅</button>
+          </div>
+        </div>
+      </div>
+      <label>Upload fajla ponude</label>
+      <input type="file" onchange="handlePonudaMaterijalUpload(this,'${c.id}','${p.id}','${o.id}')">
+      ${fileBlock('ponudaMaterijalFajl', o.ponudaMaterijalFajl)}
+
+      <div class="sub-head">Cijena okova</div>
+      <div class="row2">
+        <div><label>Cijena okova (KM)</label><input type="number" step="0.01" value="${o.cijenaOkovaIznos}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','cijenaOkovaIznos', this.value)"></div>
+        <div><label>Datum dobijanja ponude</label>
+          <div class="date-row">
+            <input type="date" value="${o.cijenaOkovaDatum}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','cijenaOkovaDatum', this.value)">
+            <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Cijena okova — ${esc(c.naziv)} / ${esc(p.naziv)}','${o.cijenaOkovaDatum}','NeVa design — ponuda za okov')">📅</button>
+          </div>
+        </div>
+      </div>
+      <label>Upload fajla ponude za okov</label>
+      <input type="file" onchange="handleCijenaOkovaUpload(this,'${c.id}','${p.id}','${o.id}')">
+      ${fileBlock('cijenaOkovaFajl', o.cijenaOkovaFajl)}
+
+      <div class="sub-head">Naša ponuda prema kupcu</div>
+      <div class="row2">
+        <div><label>Cijena materijala (KM)</label><input type="number" value="${money(num(o.ponudaMaterijalIznos))}" disabled></div>
+        <div><label>Cijena okova (KM)</label><input type="number" value="${money(num(o.cijenaOkovaIznos))}" disabled></div>
+      </div>
+      <label>Naš iznos (KM)</label>
+      <input type="number" step="0.01" value="${o.nasIznos}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','nasIznos', this.value)">
+      <div class="summary-box">
+        <div class="sum-line"><span>Trošak (materijal + okov)</span><b>${money(trosak)} KM</b></div>
+        <div class="sum-line sum-total"><span>Naša ponuda prema kupcu</span><b>${money(nasa)} KM</b></div>
+      </div>
+
+      <div class="sub-head">Očekivana zarada</div>
+      <div class="summary-box" style="background:var(--green-light);border-color:var(--green);">
+        <div class="sum-line sum-total"><span>Očekivana zarada</span><b>${money(zarada)} KM</b></div>
+      </div>
+
+      <div class="sub-head">Slanje ponude kupcu i potvrda</div>
+      <label class="checkline"><input type="checkbox" ${o.ponudaPoslataKupcu?'checked':''} onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaPoslataKupcu', this.checked)"><span>Ponuda poslata kupcu</span></label>
+      <div class="row2">
+        <div><label>Iznos ponude kupcu (KM)</label><input type="number" step="0.01" value="${o.ponudaIznos}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaIznos', this.value)"></div>
+        <div><label>Datum slanja</label><input type="date" value="${o.ponudaDatum}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaDatum', this.value)"></div>
+      </div>
+      <label class="checkline"><input type="checkbox" ${o.ponudaPotvrdjena?'checked':''} onchange="setPonudaField('${c.id}','${p.id}','${o.id}','ponudaPotvrdjena', this.checked)"><span>Ponuda potvrđena od kupca</span></label>
+      <label>Dogovoreni iznos sa kupcem (KM)</label>
+      <input type="number" step="0.01" value="${o.dogovoreniIznos}" onchange="setPonudaField('${c.id}','${p.id}','${o.id}','dogovoreniIznos', this.value)">
+
+      <div class="sub-head">Avans</div>
+      ${o.avansi.map(a=>`
+        <div class="firm-row">
+          <div class="firm-row-top">
+            <div class="grow"><label>Iznos</label><input type="number" step="0.01" value="${a.iznos}" onchange="setPonudaRowField('${c.id}','${p.id}','${o.id}','avansi','${a.id}','iznos', this.value)"></div>
+            <div class="grow"><label>Valuta</label>
+              <select onchange="setPonudaRowField('${c.id}','${p.id}','${o.id}','avansi','${a.id}','valuta', this.value)">
+                <option value="KM" ${a.valuta==='KM'?'selected':''}>Konvertibilne marke (KM)</option>
+                <option value="EUR" ${a.valuta==='EUR'?'selected':''}>Euro (EUR)</option>
+              </select>
+            </div>
+            <button class="rm-btn" onclick="removePonudaRow('${c.id}','${p.id}','${o.id}','avansi','${a.id}')" title="Ukloni">✕</button>
+          </div>
+          <div style="margin-top:8px;"><label>Datum</label><input type="date" value="${a.datum||''}" onchange="setPonudaRowField('${c.id}','${p.id}','${o.id}','avansi','${a.id}','datum', this.value)"></div>
+          ${a.valuta==='EUR' ? `<div class="note">≈ ${money(toKM(a.iznos,'EUR'))} KM (kurs 1 EUR = ${EUR_KM} KM)</div>` : ''}
+        </div>`).join('')}
+      <button class="btn btn-sm" onclick="addPonudaRow('${c.id}','${p.id}','${o.id}','avansi',{iznos:'',valuta:'KM',datum:''})">+ Dodaj avans</button>
+
+      <div class="summary-box">
+        <div class="sum-line"><span>Avans ukupno (KM)</span><b>${money(avansUkupnoKM(o))} KM</b></div>
+        <div class="sum-line sum-total"><span>Preostalo za naplatu od kupca</span><b>${money(preostaloOdKupca(o))} KM</b></div>
+      </div>
+    </div>
+  </details>`;
+}
+
+/* --- Nabavka i izrada materijala (na nivou posla) --- */
+function renderNabavkaSegment(c, p){
+  const n = p.nabavka;
+  const isporucenoCount = n.kroznaListe.filter(k=>k.isporuceno).length;
+  const statusText = n.kroznaListe.length===0 ? 'Nije počelo' : (isporucenoCount===n.kroznaListe.length ? 'Sve isporučeno' : `${isporucenoCount}/${n.kroznaListe.length} isporučeno`);
+  const statusClass = n.kroznaListe.length===0 ? 'chip-off' : (isporucenoCount===n.kroznaListe.length ? 'chip-on' : 'chip-mid');
+  const key = 'nabavka-'+p.id;
+
+  return `
+  <details class="segment" ${openAttr(key,false)} ontoggle="onSegToggle('${key}', this)">
+    <summary class="seg-head">
+      <span class="seg-num">2</span>
+      <span class="seg-title">Nabavka i izrada materijala</span>
+      <span class="seg-status ${statusClass}">${statusText}</span>
+    </summary>
+    <div class="seg-body">
+      <div class="sub-head" style="margin-top:0;">Krojna lista predata firmama za rezanje</div>
+      ${n.kroznaListe.map(r=>{
+        const f = r.fajl;
+        const isImg = f && /\.(jpe?g|png)$/i.test(f.name);
+        return `
+        <div class="firm-row">
+          <div class="firm-row-top">
+            <div class="grow"><label>Firma</label><input type="text" value="${esc(r.firma)}" placeholder="Naziv firme" onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.kroznaListe','${r.id}','firma', this.value)"></div>
+            <button class="rm-btn" onclick="removePosaoRow('${c.id}','${p.id}','nabavka.kroznaListe','${r.id}')" title="Ukloni">✕</button>
+          </div>
+          <div class="row2" style="margin-top:8px;">
+            <div><label>Datum predaje</label>
+              <div class="date-row">
+                <input type="date" value="${r.datumPredaje}" onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.kroznaListe','${r.id}','datumPredaje', this.value)">
+                <button type="button" class="cal-btn" title="Dodaj podsjetnik u kalendar" onclick="downloadICS('Predaja krojne liste — ${esc(c.naziv)} (${esc(r.firma||'firma')})','${r.datumPredaje}','NeVa design — predaja krojne liste firmi za rezanje')">📅</button>
+              </div>
+            </div>
+            <div><label>Iznos računa (KM)</label><input type="number" step="0.01" value="${r.iznos}" onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.kroznaListe','${r.id}','iznos', this.value)"></div>
+          </div>
+          <label style="margin-top:8px;">Fajl krojne liste (poslat firmi)</label>
+          <input type="file" onchange="handleCuttingFileUploadPosao(this,'${c.id}','${p.id}','${r.id}')">
+          ${f ? `<div class="file-btn-row">${isImg?`<img class="file-thumb" src="${f.dataUrl}">`:''}<span class="file-name">${esc(f.name)}</span></div>` : ''}
+          <label class="checkline"><input type="checkbox" ${r.isporuceno?'checked':''} onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.kroznaListe','${r.id}','isporuceno', this.checked)"><span>Materijal isporučen</span></label>
+        </div>`;
+      }).join('')}
+      <button class="btn btn-sm" onclick="addPosaoRow('${c.id}','${p.id}','nabavka.kroznaListe',{firma:'',datumPredaje:'',fajl:null,iznos:'',isporuceno:false})">+ Dodaj firmu za rezanje</button>
+
+      <div class="sub-head">Okovi — kupljeno</div>
+      ${n.okoviKupljeni.map(r=>`
+        <div class="firm-row">
+          <div class="firm-row-top">
+            <div class="grow"><label>Firma</label><input type="text" value="${esc(r.firma)}" placeholder="Naziv firme" onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.okoviKupljeni','${r.id}','firma', this.value)"></div>
+            <div class="grow"><label>Cijena (KM)</label><input type="number" step="0.01" value="${r.iznos}" onchange="setPosaoRowField('${c.id}','${p.id}','nabavka.okoviKupljeni','${r.id}','iznos', this.value)"></div>
+            <button class="rm-btn" onclick="removePosaoRow('${c.id}','${p.id}','nabavka.okoviKupljeni','${r.id}')" title="Ukloni">✕</button>
+          </div>
+        </div>`).join('')}
+      <button class="btn btn-sm" onclick="addPosaoRow('${c.id}','${p.id}','nabavka.okoviKupljeni',{firma:'',iznos:''})">+ Dodaj firmu za okov</button>
+    </div>
+  </details>`;
+}
+
+/* --- Izrada i montaža (na nivou posla) --- */
+function renderIzradaSegment(c, p){
+  const iz = p.izrada;
+  const statusLabels = {nije_pocelo:'Nije počelo', u_izradi:'U izradi / montaži', zavrseno:'Završeno'};
+  const statusClasses = {nije_pocelo:'chip-off', u_izradi:'chip-mid', zavrseno:'chip-on'};
+  const confirmed = p.ponude.find(o=>o.ponudaPotvrdjena);
+  const key = 'izrada-'+p.id;
+
+  return `
+  <details class="segment" ${openAttr(key,false)} ontoggle="onSegToggle('${key}', this)">
+    <summary class="seg-head">
+      <span class="seg-num">3</span>
+      <span class="seg-title">Izrada i montaža</span>
+      <span class="seg-status ${statusClasses[iz.status]}">${statusLabels[iz.status]}</span>
+    </summary>
+    <div class="seg-body">
+      <label>Status posla</label>
+      <select onchange="setPosaoField('${c.id}','${p.id}','izrada.status', this.value)">
+        <option value="nije_pocelo" ${iz.status==='nije_pocelo'?'selected':''}>Nije počelo</option>
+        <option value="u_izradi" ${iz.status==='u_izradi'?'selected':''}>U izradi / montaži</option>
+        <option value="zavrseno" ${iz.status==='zavrseno'?'selected':''}>Posao završen</option>
+      </select>
+
+      <div class="sub-head">Naplata</div>
+      <label class="checkline"><input type="checkbox" ${iz.naplata.naplaceno?'checked':''} onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.naplaceno', this.checked)"><span>Naplaćeno od kupca</span></label>
+      <div class="row2">
+        <div><label>Iznos</label><input type="number" step="0.01" value="${iz.naplata.iznos}" onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.iznos', this.value)"></div>
+        <div><label>Valuta</label>
+          <select onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.valuta', this.value)">
+            <option value="KM" ${iz.naplata.valuta==='KM'?'selected':''}>Konvertibilne marke (KM)</option>
+            <option value="EUR" ${iz.naplata.valuta==='EUR'?'selected':''}>Euro (EUR)</option>
+          </select>
+        </div>
+      </div>
+      <div class="sub-head">Podjela naplaćenog iznosa</div>
+      <div class="row2">
+        <div><label>Nešo</label><input type="number" step="0.01" value="${iz.naplata.iznosNeso}" onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.iznosNeso', this.value)"></div>
+        <div><label>Vaso</label><input type="number" step="0.01" value="${iz.naplata.iznosVaso}" onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.iznosVaso', this.value)"></div>
+      </div>
+      <div class="note">Iznosi su u istoj valuti kao i naplaćeni iznos iznad (${iz.naplata.valuta}).</div>
+      <label>Datum naplate</label>
+      <input type="date" value="${iz.naplata.datum}" onchange="setPosaoField('${c.id}','${p.id}','izrada.naplata.datum', this.value)">
+      ${iz.naplata.valuta==='EUR' ? `<div class="note">≈ ${money(toKM(iz.naplata.iznos,'EUR'))} KM (kurs 1 EUR = ${EUR_KM} KM)</div>` : ''}
+
+      ${confirmed
+        ? `<div class="summary-box"><div class="sum-line"><span>Podsjetnik — preostalo za naplatu prema potvrđenoj ponudi (${esc(confirmed.naziv)})</span><b>${money(preostaloOdKupca(confirmed))} KM</b></div></div>`
+        : `<div class="note">Nijedna ponuda za ovaj posao još nije potvrđena, pa se ne prikazuje preostali iznos za naplatu.</div>`}
+    </div>
+  </details>`;
+}
+
+/* ---------- Pregled (overview, po poslovima) ---------- */
+function renderPregled(){
+  if(state.customers.length===0) return `<div class="empty"><div class="empty-title">Nema podataka</div>Dodajte kupce da vidite pregled faza posla.</div>`;
+  const stat = `<div class="stat-card"><div class="stat-label">Ukupan prihod (naplaćeno)</div><div class="stat-value">${money(ukupanPrihod())} KM</div></div>`;
+  let rows = '';
+  state.customers.slice().reverse().forEach(c=>{
+    c.poslovi.slice().reverse().forEach(p=>{
+      const n = p.nabavka;
+      const isporucenoCount = n.kroznaListe.filter(k=>k.isporuceno).length;
+      const materijalStatus = n.kroznaListe.length===0 ? false : (isporucenoCount===n.kroznaListe.length);
+      rows += `<div class="card pregled-card">
+        <div class="cust-name" style="cursor:pointer;" onclick="openCustomer('${c.id}')">${esc(c.naziv)} — ${esc(p.naziv)}</div>
+        <div class="chip-grid">
+          ${chip(p.dizajnPredat,'Dizajn predat')}
+          ${chip(p.dizajnPotvrdjen,'Dizajn potvrđen')}
+          ${chip(p.ponude.some(o=>o.ponudaPoslataKupcu),'Ponuda poslata')}
+          ${chip(p.ponude.some(o=>o.ponudaPotvrdjena),'Ponuda potvrđena')}
+          ${chip(p.ponude.some(o=>o.avansi.length>0),'Avans dat')}
+          ${chip(n.kroznaListe.length>0,'Finalna krojna lista poslata')}
+          ${chip(materijalStatus,'Materijal isporučen')}
+          ${chip(p.izrada.status==='u_izradi'||p.izrada.status==='zavrseno','U izradi / montaži')}
+          ${chip(p.izrada.naplata.naplaceno,'Naplaćeno')}
+        </div>
+      </div>`;
+    });
+  });
+  return stat + `<h2 class="section-title">Pregled po poslovima</h2>` + rows;
+}
+
+/* ---------- Izvještaji (reports) ---------- */
+function renderIzvestaji(){
+  if(state.customers.length===0) return `<div class="empty"><div class="empty-title">Nema podataka</div>Izvještaji će se pojaviti kada unesete podatke o nabavci materijala i okova.</div>`;
+
+  const rezanje = {}; const okovi = {};
+  state.customers.forEach(c=>{
+    c.poslovi.forEach(p=>{
+      p.nabavka.kroznaListe.forEach(r=>{
+        const key = (r.firma||'(bez naziva)').trim() || '(bez naziva)';
+        rezanje[key] = (rezanje[key]||0) + num(r.iznos);
+      });
+      p.nabavka.okoviKupljeni.forEach(r=>{
+        const key = (r.firma||'(bez naziva)').trim() || '(bez naziva)';
+        okovi[key] = (okovi[key]||0) + num(r.iznos);
+      });
+    });
+  });
+
+  const stat = `<div class="stat-card"><div class="stat-label">Ukupan prihod (naplaćeno)</div><div class="stat-value">${money(ukupanPrihod())} KM</div></div>`;
+  const podjela = ukupnoPoOsobi();
+  const statOsobe = `<div class="row2" style="margin-bottom:22px;">
+    <div class="stat-card"><div class="stat-label">Ukupno — Nešo</div><div class="stat-value">${money(podjela.neso)} KM</div></div>
+    <div class="stat-card"><div class="stat-label">Ukupno — Vaso</div><div class="stat-value">${money(podjela.vaso)} KM</div></div>
+  </div>`;
+  return stat + statOsobe + `
+    <h2 class="section-title">Utrošeno po firmama za rezanje materijala</h2>
+    ${renderBarList(rezanje, '')}
+    <div class="note" style="margin-bottom:22px;">Zasnovano na iznosima unesenim u segmentu "Nabavka i izrada materijala".</div>
+
+    <h2 class="section-title">Utrošeno po firmama za okove</h2>
+    ${renderBarList(okovi, 'amber')}
+    <div class="note">Zasnovano na iznosima unesenim u segmentu "Nabavka i izrada materijala".</div>
+  `;
+}
+function renderBarList(dataObj, barClass){
+  const entries = Object.entries(dataObj).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0) return `<div class="note">Još nema unesenih iznosa.</div>`;
+  const max = Math.max(...entries.map(e=>e[1]), 1);
+  return `<div class="card">` + entries.map(([firma, iznos])=>`
+    <div class="rep-item">
+      <div class="rep-label"><span>${esc(firma)}</span><span>${money(iznos)} KM</span></div>
+      <div class="rep-bar-bg"><div class="rep-bar ${barClass}" style="width:${Math.max(3,(iznos/max*100))}%"></div></div>
+    </div>`).join('') + `</div>`;
+}
+
+/* Prijava/odjava se obrađuje kroz auth.onAuthStateChanged (gore) — 
+   ono samo poziva loadData() kad je korisnik prijavljen. */
+</script>
+</body>
+</html>
